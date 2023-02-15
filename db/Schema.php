@@ -435,7 +435,16 @@ abstract class Schema extends BaseObject
         $result = [];
         foreach ($tableSchema->primaryKey as $name) {
             if ($tableSchema->columns[$name]->autoIncrement) {
-                $result[$name] = $this->getLastInsertID($tableSchema->sequenceName);
+                if($table === 'Node'){
+                    $nodeHistoryId = $this->getLastInsertID();
+                    $id = Yii::$app->db->createCommand('SELECT nodeId FROM NodeHistory WHERE logId=:logId')
+                        ->bindValue(':logId', $nodeHistoryId)
+                        ->queryScalar();
+                }else{
+                    $id = $this->getLastInsertID($tableSchema->sequenceName);
+                }
+                
+                $result[$name] = $id;
                 break;
             }
 
